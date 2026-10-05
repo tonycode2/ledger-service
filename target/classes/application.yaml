@@ -15,3 +15,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/ledger-service
+    user: migration-admin
+    password: migration
