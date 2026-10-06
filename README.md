@@ -16,3 +16,14 @@ concurrent requests and client retries.
 - [ ] Concurrency control
 - [ ] Idempotency
 - [ ] Outbox and messaging
+
+## Used Stack
+- Java 21
+- Spring Boot 4.1.1
+- Docker
+- Testcontainers
+- JPA
+- Hibernate
+- PostgreSQL
+- FlyWay
+- Validation
