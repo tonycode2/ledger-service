@@ -11,8 +11,19 @@ concurrent requests and client retries.
 🚧 Under active development.
 
 - [x] Project setup
-- [ ] Data model and balance rules
+- [x] Data model and balance rules
 - [ ] Transfers and deposits
 - [ ] Concurrency control
 - [ ] Idempotency
 - [ ] Outbox and messaging
+
+## Used Stack
+- Java 21
+- Spring Boot 4.1.1
+- Docker
+- Testcontainers
+- JPA
+- Hibernate
+- PostgreSQL
+- FlyWay
+- Validation
