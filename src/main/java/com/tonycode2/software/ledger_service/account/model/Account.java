@@ -113,4 +113,5 @@ public class Account {
     public boolean hasSameCurrency(Account other) {
         return other.getCurrency().equals(this.getCurrency());
     }
+
 }

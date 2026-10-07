@@ -31,6 +31,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(AccountNotFoundException.class)
+    ProblemDetail handle(AccountNotFoundException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.NOT_FOUND, ex.getMessage(), "Account Not Found");
+        return pd;
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);
