@@ -1,9 +1,11 @@
 package com.tonycode2.software.ledger_service.account.model;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,6 +57,22 @@ public class AccountTest {
     void CreateAccount_CurrencyShouldTransform_ReturnsCurrencyToUpperCase(String currency) {
         Account account = new Account("Ana", currency, AccountType.CUSTOMER, false);
         assertEquals(account.getCurrency(), "USD");
+    }
+
+    // Happy case
+    @Test
+    void CreateAccount_HappyCase_ReturnsCorrectlyCreatedClass() {
+        Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
+        assertEquals(account.getBalance(), 0);
+        assertNotNull(account.getCreatedAt());
+        assertNull(account.getId());
+    }
+
+    @Test
+    void CreateSystemAccount_HappyCase_ReturnsCorrectlyCreatedClass() {
+        Account account = new Account("Ana", "USD", AccountType.SYSTEM, true);
+        assertTrue(account.isAllowNegative());
+        assertEquals(account.getType(), AccountType.SYSTEM);
     }
 
     // Function tests
