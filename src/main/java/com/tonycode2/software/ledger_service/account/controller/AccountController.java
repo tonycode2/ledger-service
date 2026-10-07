@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/account")
-@Validated
 public class AccountController {
     private final AccountService service;
 
