@@ -2,6 +2,8 @@ package com.tonycode2.software.ledger_service.account.model;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,9 +11,13 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
+import com.tonycode2.software.ledger_service.common.exceptions.InsufficientFundsException;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidAccountException;
+import com.tonycode2.software.ledger_service.common.exceptions.InvalidAmountException;
 
 public class AccountTest {
+
+    // Constructor tests
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = { "US", "USDD", "U$D", "    " })
@@ -50,4 +56,41 @@ public class AccountTest {
         Account account = new Account("Ana", currency, AccountType.CUSTOMER, false);
         assertEquals(account.getCurrency(), "USD");
     }
+
+    // Function tests
+    @ParameterizedTest
+    @ValueSource(longs = { 0, -2L, -10L, -1000L })
+    void Credit_AmountIsLessThan0_ThrowsInvalidAmountException(long amount) {
+        assertThatThrownBy(() -> {
+            Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
+            account.credit(amount);
+        }).isInstanceOf(InvalidAmountException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 0, -2L, -10L, -1000L })
+    void Debit_AmountIsLessThan0_ThrowsInvalidAmountException(long amount) {
+        assertThatThrownBy(() -> {
+            Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
+            account.debit(amount);
+        }).isInstanceOf(InvalidAmountException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 101, 200L, 400L, 1000L })
+    void Debit_AllowNegativeIsFalseAndAmountIsMoreThanBalance_ThrowsInsuficientFundsException(long amount) {
+        assertThatThrownBy(() -> {
+            Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
+            account.credit(100L);
+            account.debit(amount);
+        }).isInstanceOf(InsufficientFundsException.class);
+    }
+
+    @Test
+    void HasSameCurrency_IfCurrencyIsNotTheSame_ReturnFalse() {
+        Account account1 = new Account("Ana", "USD", AccountType.CUSTOMER, false);
+        Account account2 = new Account("Ana", "CRC", AccountType.CUSTOMER, false);
+        assertFalse(account1.hasSameCurrency(account2));
+    }
+
 }
