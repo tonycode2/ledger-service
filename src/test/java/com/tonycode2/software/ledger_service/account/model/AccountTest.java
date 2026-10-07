@@ -25,31 +25,32 @@ public class AccountTest {
     @ValueSource(strings = { "US", "USDD", "U$D", "    " })
     void CreateAccount_WithIncorrectCurrency_ThrowsInvalidAccountException(String currency) {
         assertThatThrownBy(() -> new Account("Ana", currency, AccountType.CUSTOMER, false))
-                .isInstanceOf(InvalidAccountException.class);
+                .isInstanceOf(InvalidAccountException.class).hasMessageContaining("Currency must be 3 letters long");
     }
 
     @Test
     void CreateAccount_WithNullOwner_ThrowsInvalidAccountException() {
         assertThatThrownBy(() -> new Account(null, "USD", AccountType.CUSTOMER, false))
-                .isInstanceOf(InvalidAccountException.class);
+                .isInstanceOf(InvalidAccountException.class).hasMessageContaining("Owner is required");
     }
 
     @Test
     void CreateAccount_WithBlankOwner_ThrowsInvalidAccountException() {
         assertThatThrownBy(() -> new Account("", "USD", AccountType.CUSTOMER, false))
-                .isInstanceOf(InvalidAccountException.class);
+                .isInstanceOf(InvalidAccountException.class).hasMessageContaining("Owner is required");
     }
 
     @Test
     void CreateAccount_BeingCustomerWithAllowNegativeTrue_ThrowsInvalidAccountException() {
         assertThatThrownBy(() -> new Account("Ana", "USD", AccountType.CUSTOMER, true))
-                .isInstanceOf(InvalidAccountException.class);
+                .isInstanceOf(InvalidAccountException.class)
+                .hasMessageContaining("Only system accounts allow negative balance");
     }
 
     @Test
     void CreateAccount_TypeNull_ThrowsInvalidAccountException() {
         assertThatThrownBy(() -> new Account("Ana", "USD", null, false))
-                .isInstanceOf(InvalidAccountException.class);
+                .isInstanceOf(InvalidAccountException.class).hasMessageContaining("Type is required");
     }
 
     @ParameterizedTest
@@ -82,7 +83,7 @@ public class AccountTest {
         assertThatThrownBy(() -> {
             Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
             account.credit(amount);
-        }).isInstanceOf(InvalidAmountException.class);
+        }).isInstanceOf(InvalidAmountException.class).hasMessageContaining("The amount is not positive");
     }
 
     @ParameterizedTest
@@ -91,7 +92,7 @@ public class AccountTest {
         assertThatThrownBy(() -> {
             Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
             account.debit(amount);
-        }).isInstanceOf(InvalidAmountException.class);
+        }).isInstanceOf(InvalidAmountException.class).hasMessageContaining("The amount is not positive");
     }
 
     @ParameterizedTest
@@ -101,7 +102,7 @@ public class AccountTest {
             Account account = new Account("Ana", "USD", AccountType.CUSTOMER, false);
             account.credit(100L);
             account.debit(amount);
-        }).isInstanceOf(InsufficientFundsException.class);
+        }).isInstanceOf(InsufficientFundsException.class).hasMessageContaining("requested");
     }
 
     @Test
