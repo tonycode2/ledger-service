@@ -7,6 +7,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
+import com.tonycode2.software.ledger_service.common.exceptions.InsufficientFundsException;
+import com.tonycode2.software.ledger_service.common.exceptions.InvalidAmountException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,22 +33,30 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType type;
     @Column(name = "allow_negative")
-    private boolean allowNegative = false;
-    private long balance = 0L;
+    private boolean allowNegative;
+    private long balance;
     @Version
-    private long version = 0L;
+    private long version;
     @Column(name = "created_at", updatable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     protected Account() {
     }
 
     public Account(String owner, String currency, AccountType type, boolean allowNegative) {
+        if (owner == null || owner.isBlank())
+            throw new IllegalArgumentException("Owner is required");
+        if (currency == null || currency.isBlank() || !currency.matches("[A-Za-z]{3}"))
+            throw new IllegalArgumentException("Currency must be 3 letters long");
+        if (allowNegative && type != AccountType.SYSTEM)
+            throw new IllegalArgumentException("Only system accounts allow negative balance");
+        if (type == null)
+            throw new IllegalArgumentException("Type is required");
         this.owner = owner;
-        this.currency = currency;
+        this.currency = currency.toUpperCase();
         this.type = type;
         this.allowNegative = allowNegative;
-        this.balance = 0l;
+        this.balance = 0L;
         this.createdAt = Instant.now();
     }
 
@@ -82,4 +92,24 @@ public class Account {
         return createdAt;
     }
 
+    public void credit(long amount) {
+        if (!(amount > 0))
+            throw new InvalidAmountException(amount);
+
+        this.balance = Math.addExact(this.balance, amount);
+    }
+
+    public void debit(long amount) {
+        if (!(amount > 0))
+            throw new InvalidAmountException(amount);
+
+        if (!this.allowNegative && amount > this.balance)
+            throw new InsufficientFundsException(this.id, this.balance, amount);
+
+        this.balance = Math.subtractExact(this.balance, amount);
+    }
+
+    public boolean hasSameCurrency(Account other) {
+        return other.getCurrency().equals(this.getCurrency());
+    }
 }
