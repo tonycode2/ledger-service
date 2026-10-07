@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
 import com.tonycode2.software.ledger_service.common.exceptions.InsufficientFundsException;
+import com.tonycode2.software.ledger_service.common.exceptions.InvalidAccountException;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidAmountException;
 
 import jakarta.persistence.Column;
@@ -45,13 +46,13 @@ public class Account {
 
     public Account(String owner, String currency, AccountType type, boolean allowNegative) {
         if (owner == null || owner.isBlank())
-            throw new IllegalArgumentException("Owner is required");
+            throw new InvalidAccountException("Owner is required");
         if (currency == null || currency.isBlank() || !currency.matches("[A-Za-z]{3}"))
-            throw new IllegalArgumentException("Currency must be 3 letters long");
+            throw new InvalidAccountException("Currency must be 3 letters long");
         if (allowNegative && type != AccountType.SYSTEM)
-            throw new IllegalArgumentException("Only system accounts allow negative balance");
+            throw new InvalidAccountException("Only system accounts allow negative balance");
         if (type == null)
-            throw new IllegalArgumentException("Type is required");
+            throw new InvalidAccountException("Type is required");
         this.owner = owner;
         this.currency = currency.toUpperCase();
         this.type = type;
