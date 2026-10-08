@@ -6,7 +6,7 @@ public class AccountNotFoundException extends LedgerException {
     private UUID id;
 
     public AccountNotFoundException(UUID id) {
-        super("Account %d not found".formatted(id));
+        super("Account %s not found".formatted(id));
         this.id = id;
     }
 
