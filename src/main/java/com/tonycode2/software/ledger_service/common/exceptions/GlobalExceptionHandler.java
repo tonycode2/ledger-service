@@ -21,26 +21,26 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InsufficientFundsException.class)
-    ProblemDetail handle(InsufficientFundsException ex) {
+    ProblemDetail handleInsuficientFounds(InsufficientFundsException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
                 "Insufficient Funds");
         return pd;
     }
 
     @ExceptionHandler(InvalidAmountException.class)
-    ProblemDetail handle(InvalidAmountException ex) {
+    ProblemDetail handleInvalidAmount(InvalidAmountException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(), "Invalid Amount");
         return pd;
     }
 
     @ExceptionHandler(InvalidAccountException.class)
-    ProblemDetail handle(InvalidAccountException ex) {
+    ProblemDetail handleInvalidAccount(InvalidAccountException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(), "Invalid Account");
         return pd;
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    ProblemDetail handle(AccountNotFoundException ex) {
+    ProblemDetail handleAccountNotFound(AccountNotFoundException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.NOT_FOUND, ex.getMessage(), "Account Not Found");
         return pd;
     }
