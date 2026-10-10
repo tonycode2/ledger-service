@@ -18,7 +18,7 @@ import com.tonycode2.software.ledger_service.account.service.AccountService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/account")
+@RequestMapping("/api/v1/accounts")
 public class AccountController {
     private final AccountService service;
 
