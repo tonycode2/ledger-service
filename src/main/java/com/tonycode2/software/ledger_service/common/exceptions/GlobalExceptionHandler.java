@@ -45,6 +45,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(InvalidLedgerTransactionException.class)
+    ProblemDetail handleInvalidLedgerTransaction(InvalidLedgerTransactionException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Invalid Ledger Transaction");
+        return pd;
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);
