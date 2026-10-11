@@ -66,8 +66,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCurrencyException.class)
-    ProblemDetail handleInvalidCurrencyException(InvalidCurrencyException ex){
-        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), "Invalid Currency")
+    ProblemDetail handleInvalidCurrencyException(InvalidCurrencyException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
+                "Invalid Currency");
+        return pd;
     }
 
     @ExceptionHandler(Exception.class)
