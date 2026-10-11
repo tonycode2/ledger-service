@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
+    // TODO: NEED TO TEST THIS CLASS
     @ExceptionHandler(InsufficientFundsException.class)
     ProblemDetail handleInsuficientFounds(InsufficientFundsException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
@@ -42,6 +42,33 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccountNotFoundException.class)
     ProblemDetail handleAccountNotFound(AccountNotFoundException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.NOT_FOUND, ex.getMessage(), "Account Not Found");
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidLedgerTransactionException.class)
+    ProblemDetail handleInvalidLedgerTransaction(InvalidLedgerTransactionException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Invalid Ledger Transaction");
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidEntryException.class)
+    ProblemDetail handleInvalidEntryException(InvalidEntryException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(), "Invalid Entry");
+        return pd;
+    }
+
+    @ExceptionHandler(IdempotencyKeyReusedException.class)
+    ProblemDetail handleDepositWithIncorrectInformationException(IdempotencyKeyReusedException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
+                "Invalid hash with current idempotency key");
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidCurrencyException.class)
+    ProblemDetail handleInvalidCurrencyException(InvalidCurrencyException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
+                "Invalid Currency");
         return pd;
     }
 
