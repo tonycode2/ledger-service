@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidLedgerTransactionException;
+import com.tonycode2.software.ledger_service.ledger.model.enums.TransactionType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

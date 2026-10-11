@@ -6,6 +6,7 @@ import org.hibernate.annotations.Immutable;
 
 import com.tonycode2.software.ledger_service.account.model.Account;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidEntryException;
+import com.tonycode2.software.ledger_service.ledger.model.enums.EntryDirection;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

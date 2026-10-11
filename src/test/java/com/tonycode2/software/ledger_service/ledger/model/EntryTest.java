@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.tonycode2.software.ledger_service.account.model.Account;
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidEntryException;
+import com.tonycode2.software.ledger_service.ledger.model.enums.EntryDirection;
+import com.tonycode2.software.ledger_service.ledger.model.enums.TransactionType;
 
 public class EntryTest {
 

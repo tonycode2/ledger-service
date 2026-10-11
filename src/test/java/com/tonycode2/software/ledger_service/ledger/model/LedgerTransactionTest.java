@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidLedgerTransactionException;
+import com.tonycode2.software.ledger_service.ledger.model.enums.TransactionType;
 
 public class LedgerTransactionTest {
     @Test
