@@ -22,7 +22,7 @@ public class LedgerTransaction {
     private UUID id;
     @Column(name = "idempotency_key", updatable = false)
     private String idempotencyKey;
-    @Column(name = "request_hash", updatable = false)
+    @Column(name = "request_hash", updatable = false, length = 64)
     private String requestHash;
     @Enumerated(EnumType.STRING)
     @Column(updatable = false)

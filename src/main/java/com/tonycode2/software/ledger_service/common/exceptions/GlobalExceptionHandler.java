@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
+    // TODO: NEED TO TEST THIS CLASS
     @ExceptionHandler(InsufficientFundsException.class)
     ProblemDetail handleInsuficientFounds(InsufficientFundsException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
@@ -49,6 +49,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ProblemDetail handleInvalidLedgerTransaction(InvalidLedgerTransactionException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(),
                 "Invalid Ledger Transaction");
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidEntryException.class)
+    ProblemDetail handleInvalidEntryException(InvalidEntryException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(), "Invalid Entry");
         return pd;
     }
 

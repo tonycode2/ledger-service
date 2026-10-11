@@ -1,6 +1,9 @@
 package com.tonycode2.software.ledger_service.ledger.model;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.UUID;
 
@@ -65,4 +68,15 @@ public class LedgerTransactionTest {
                 .hasMessageContaining("If the Transaction Type is DEPOSIT or TRANSFER, the Reverses ID must be null");
     }
 
+    void CreateLedgerTransaction_HappyCase_ReturnsCorrectlyCreatedLedgerTransaction() {
+        LedgerTransaction transaction = new LedgerTransaction("Id", "key", TransactionType.DEPOSIT, null);
+        assertNull(transaction.getId());
+        assertEquals(transaction.getIdempotencyKey(), "Id");
+        assertEquals(transaction.getRequestHash(), "key");
+        assertNotNull(transaction.getType());
+        assertEquals(transaction.getType(), TransactionType.DEPOSIT);
+        assertNull(transaction.getReversesId());
+        assertNotNull(transaction.getCreatedAt());
+
+    }
 }
