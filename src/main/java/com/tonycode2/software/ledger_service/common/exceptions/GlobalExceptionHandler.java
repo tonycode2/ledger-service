@@ -58,6 +58,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(IdempotencyKeyReusedException.class)
+    ProblemDetail handleDepositWithIncorrectInformationException(IdempotencyKeyReusedException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
+                "Invalid hash with current idempotency key");
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidCurrencyException.class)
+    ProblemDetail handleInvalidCurrencyException(InvalidCurrencyException ex){
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), "Invalid Currency")
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);
