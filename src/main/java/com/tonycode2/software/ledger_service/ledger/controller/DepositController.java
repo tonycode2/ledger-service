@@ -15,7 +15,7 @@ import com.tonycode2.software.ledger_service.ledger.service.DepositService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@RequestMapping("/api/v1/controllers")
+@RequestMapping("/api/v1/deposits")
 public class DepositController {
     private final DepositService service;
 
