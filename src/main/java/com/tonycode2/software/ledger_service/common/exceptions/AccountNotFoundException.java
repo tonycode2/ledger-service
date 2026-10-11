@@ -10,6 +10,10 @@ public class AccountNotFoundException extends LedgerException {
         this.id = id;
     }
 
+    public AccountNotFoundException(String message) {
+        super(message);
+    }
+
     public UUID getId() {
         return id;
     }
