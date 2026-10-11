@@ -21,12 +21,12 @@ public class LedgerTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "idempotency_key", updatable = false)
+    @Column(name = "idempotency_key", updatable = false, unique = true)
     private String idempotencyKey;
     @Column(name = "request_hash", updatable = false, length = 64)
     private String requestHash;
     @Enumerated(EnumType.STRING)
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private TransactionType type;
     @Column(name = "reverses_id", updatable = false)
     private UUID reversesId;

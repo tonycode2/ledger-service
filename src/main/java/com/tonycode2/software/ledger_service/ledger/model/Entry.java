@@ -34,7 +34,7 @@ public class Entry {
     @JoinColumn(name = "account_id", nullable = false, updatable = false)
     private Account account;
     @Enumerated(EnumType.STRING)
-    @Column(name = "direction")
+    @Column(name = "direction", nullable = false)
     private EntryDirection EntryDirection;
     @Column(nullable = false, updatable = false)
     private long amount;
