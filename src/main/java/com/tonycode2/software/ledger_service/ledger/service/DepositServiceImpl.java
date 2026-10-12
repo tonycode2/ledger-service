@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tonycode2.software.ledger_service.Utils.RequestHasher;
 import com.tonycode2.software.ledger_service.account.model.Account;
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
 import com.tonycode2.software.ledger_service.account.repository.AccountRepository;
@@ -47,7 +48,7 @@ public class DepositServiceImpl implements DepositService {
         DepositHash hash = new DepositHash(TransactionType.DEPOSIT.toString(), deposit.accountId(), deposit.amount(),
                 deposit.currency().toUpperCase());
 
-        String requestHash = requestHashHelper(hash);
+        String requestHash = RequestHasher.requestHashHelper(hash);
         Optional<LedgerTransaction> ledgerTransactionWithSameIdempotency = ledgerTransactionRepository
                 .findByIdempotencyKey(idempotencyKey);
 
@@ -70,7 +71,7 @@ public class DepositServiceImpl implements DepositService {
             throw new InvalidCurrencyException("The deposit currency is not the same as the account currency");
         }
 
-        List<Account> externalAccountList = accountRepository.findByCurrencyAndType(deposit.currency(),
+        List<Account> externalAccountList = accountRepository.findByCurrencyAndType(deposit.currency().toUpperCase(),
                 AccountType.SYSTEM);
         if (externalAccountList.isEmpty()) {
             throw new AccountNotFoundException("The external account was not found");
@@ -90,22 +91,6 @@ public class DepositServiceImpl implements DepositService {
         return new DepositResponse(savedTransaction.getId(), savedTransaction.getType(),
                 customerAccount.getId(), deposit.amount());
 
-    }
-
-    private String requestHashHelper(DepositHash h) {
-        String canonical = String.join("|",
-                TransactionType.DEPOSIT.toString(),
-                h.accountId().toString(),
-                String.valueOf(h.amount()),
-                h.currency());
-
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(canonical.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is not available", e);
-        }
     }
 
 }
