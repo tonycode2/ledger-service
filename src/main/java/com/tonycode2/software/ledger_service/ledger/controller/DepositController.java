@@ -1,7 +1,5 @@
 package com.tonycode2.software.ledger_service.ledger.controller;
 
-import java.util.UUID;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
