@@ -14,9 +14,10 @@ concurrent requests and client retries.
 - [x] Project setup
 - [x] Data model and balance rules
 - [x] Accounts API (create and get)
-- [ ] Deposits and transfers
+- [x] Deposits
+- [ ] Transfers
 - [ ] Concurrency control
-- [ ] Idempotency
+- [x] Idempotency (sequential retries; concurrent retries pending)
 - [ ] Outbox and messaging
 
 ## Quick start
@@ -55,8 +56,9 @@ The project is not deployed yet. Run it locally.
 |---|---|---|
 | POST | `/api/v1/accounts` | Create an account |
 | GET | `/api/v1/accounts/{id}` | Get account details and balance |
+| POST | `/api/v1/deposits` | Create a deposit |
 
-Create an account:
+### Create an account:
 
 ```http
 POST /api/v1/accounts
@@ -74,8 +76,54 @@ Content-Type: application/json
   "createdAt": "2026-10-07T15:30:00Z"
 }
 ```
+Code 201 Created
 
-> All money amounts are integers in minor units (cents). `1050` means $10.50.
+### Get an account:
+```http
+GET /api/v1/accounts/8b4d5b3e-a546-44c5-8321-6ff561150fdb
+```
+
+```json
+{
+  "id": "8b4d5b3e-a546-44c5-8321-6ff561150fdb",
+  "owner": "Ana",
+  "currency": "USD",
+  "balance": 0,
+  "createdAt": "2026-10-07T15:30:00Z"
+}
+```
+Code 200 Ok
+
+### Create a deposit:
+```http
+POST /api/v1/deposits
+Content-Type: application/json
+X-Idempotency-Key: idk-123
+
+{ "accountId": "8b4d5b3e-a546-44c5-8321-6ff561150fdb", "amount": 100, "currency": "USD" }
+```
+
+Note: The client generates the key (for example, a UUID) and reuses it only to retry the same request. Use a new key for every new deposit. 
+
+When you send the request, the system will:
+1. Computes a SHA-256 hash of the deposit (Transaction Type, Account Id, Deposit Amount and Currency). 
+2. Checks if the Idempotency Key sent in the header already exists; if the key exists and the hash of the deposit is the same as well, it returns the original transaction and will not move any money. So, if this happens the system will take this as a retry
+3. When a deposit request arrives, the system: Checks if the idempotency key already exists, but the hash is not the same, the request is rejected with a 422 as the key has already been used with a different deposit information. 
+4. When a deposit request arrives, the system: Checks if the idempotency key does not exist, then the system will check that the currency sent in the deposit is the same as the one configured in the customer's account
+5. Creates the transaction and both entries (debit and credit) in one database transaction. 
+6. On success, it responds with:
+
+```json
+{
+  "transactionId": "7b2d5b30-8321-a546-44c5-6ff572220fdb",
+  "type": "DEPOSIT",
+  "accountId": "8b4d5b3e-a546-44c5-8321-6ff561150fdb",
+  "amount": 100
+}
+```
+Code 200 Ok
+
+> All money amounts are integers in minor units (cents). `100` means $1.00.
 
 Errors follow the `ProblemDetail` format:
 
@@ -94,21 +142,33 @@ Errors follow the `ProblemDetail` format:
 as `double`. Sums are exact and there are no rounding errors.
 
 **Immutable entries.** A database trigger rejects any `UPDATE` or `DELETE` on the
-`entries` table. A mistake is corrected with a new reversing transaction, so the full
+`entries` table. *A mistake is corrected with a new reversing transaction (planned)*, so the full
 history is always kept.
 
 **Balanced transactions enforced by the database.** A deferred constraint checks, at
-commit time, that debits equal credits in every transaction. The rule holds even if
-application code has a bug.
+commit time, that debits equal credits in every transaction. *The rule holds even if
+application code has a bug (test pending)*.
 
 **Schema owned by Flyway.** Hibernate runs with `ddl-auto: validate`. If an entity and
 a migration disagree, the application refuses to start.
+
+**Idempotency.** The client generates an idempotency key for each operation and sends it 
+in the `X-Idempotency-Key` header. This key is unique per transaction, and it's just re-used
+with a retry. If the key already exists with the same content, nothing 
+is written again and the original result is returned. This protects against failures such 
+as a lost network response, where the client cannot know if the request succeeded and has 
+to retry. If the client sends a request using an already existing Idempotency Key, but with
+different content, it gets rejected with a 422. The content is compared so that a reused key 
+cannot return the result of a different operation.   
 
 ## Known limitations
 
 - One currency per account.
 - Debit and credit follow a simplified convention: debit takes money out of an
   account, credit puts money in.
+- Concurrent retries with the same idempotency key are not handled yet (the database rejects the duplicate, but the client gets a generic error).
+- No concurrency control yet on balances.
+- The deposit response does not include the new balance. Use `GET /api/v1/accounts/{id}`.
 
 ## Tech stack
 

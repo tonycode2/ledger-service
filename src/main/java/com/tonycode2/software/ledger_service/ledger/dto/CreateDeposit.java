@@ -10,5 +10,4 @@ public record CreateDeposit(
         UUID accountId,
         @Positive @NotNull long amount,
         @NotBlank String currency) {
-
 }
