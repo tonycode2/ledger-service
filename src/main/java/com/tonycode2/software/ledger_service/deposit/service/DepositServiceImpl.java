@@ -1,4 +1,4 @@
-package com.tonycode2.software.ledger_service.ledger.service;
+package com.tonycode2.software.ledger_service.deposit.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +13,9 @@ import com.tonycode2.software.ledger_service.account.repository.AccountRepositor
 import com.tonycode2.software.ledger_service.common.exceptions.AccountNotFoundException;
 import com.tonycode2.software.ledger_service.common.exceptions.IdempotencyKeyReusedException;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidCurrencyException;
-import com.tonycode2.software.ledger_service.ledger.dto.CreateDeposit;
-import com.tonycode2.software.ledger_service.ledger.dto.DepositHash;
-import com.tonycode2.software.ledger_service.ledger.dto.DepositResponse;
+import com.tonycode2.software.ledger_service.deposit.dto.CreateDeposit;
+import com.tonycode2.software.ledger_service.deposit.dto.DepositHash;
+import com.tonycode2.software.ledger_service.deposit.dto.DepositResponse;
 import com.tonycode2.software.ledger_service.ledger.model.Entry;
 import com.tonycode2.software.ledger_service.ledger.model.LedgerTransaction;
 import com.tonycode2.software.ledger_service.ledger.model.enums.EntryDirection;

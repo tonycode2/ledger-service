@@ -1,4 +1,4 @@
-package com.tonycode2.software.ledger_service.ledger.dto;
+package com.tonycode2.software.ledger_service.deposit.dto;
 
 import java.util.UUID;
 

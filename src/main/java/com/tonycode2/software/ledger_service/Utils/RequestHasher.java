@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-import com.tonycode2.software.ledger_service.ledger.dto.DepositHash;
+import com.tonycode2.software.ledger_service.deposit.dto.DepositHash;
 import com.tonycode2.software.ledger_service.ledger.model.enums.TransactionType;
 
 public class RequestHasher {
