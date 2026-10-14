@@ -15,7 +15,7 @@ concurrent requests and client retries.
 - [x] Data model and balance rules
 - [x] Accounts API (create and get)
 - [x] Deposits
-- [ ] Transfers
+- [x] Transfers
 - [ ] Concurrency control
 - [x] Idempotency (sequential retries; concurrent retries pending)
 - [ ] Outbox and messaging
