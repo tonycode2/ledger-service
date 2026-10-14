@@ -1,4 +1,4 @@
-package com.tonycode2.software.ledger_service.ledger.dto;
+package com.tonycode2.software.ledger_service.deposit.dto;
 
 import java.util.UUID;
 
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record CreateDeposit(
-        UUID accountId,
-        @Positive @NotNull long amount,
-        @NotBlank String currency) {
+                UUID accountId,
+                @Positive @NotNull long amount,
+                @NotBlank String currency) {
 }

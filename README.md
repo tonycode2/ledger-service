@@ -105,13 +105,12 @@ X-Idempotency-Key: idk-123
 
 Note: The client generates the key (for example, a UUID) and reuses it only to retry the same request. Use a new key for every new deposit. 
 
-When you send the request, the system will:
+When you send the deposit request, the system will:
 1. Computes a SHA-256 hash of the deposit (Transaction Type, Account Id, Deposit Amount and Currency). 
-2. Checks if the Idempotency Key sent in the header already exists; if the key exists and the hash of the deposit is the same as well, it returns the original transaction and will not move any money. So, if this happens the system will take this as a retry
-3. When a deposit request arrives, the system: Checks if the idempotency key already exists, but the hash is not the same, the request is rejected with a 422 as the key has already been used with a different deposit information. 
-4. When a deposit request arrives, the system: Checks if the idempotency key does not exist, then the system will check that the currency sent in the deposit is the same as the one configured in the customer's account
-5. Creates the transaction and both entries (debit and credit) in one database transaction. 
-6. On success, it responds with:
+2. When a deposit request arrives, the system: Checks if the idempotency key already exists, but the hash is not the same, the request is rejected with a 422 as the key has already been used with a different deposit information. 
+3. When a deposit request arrives, the system: Checks if the idempotency key does not exist, then the system will check that the currency sent in the deposit is the same as the one configured in the customer's account
+4. Creates the transaction and both entries (debit and credit) in one database transaction. 
+5. On success, it responds with:
 
 ```json
 {
@@ -121,7 +120,7 @@ When you send the request, the system will:
   "amount": 100
 }
 ```
-Code 200 Ok
+Code 201 Created
 
 > All money amounts are integers in minor units (cents). `100` means $1.00.
 
@@ -136,6 +135,36 @@ Errors follow the `ProblemDetail` format:
 }
 ```
 
+### Transfer
+```http
+POST /api/v1/transfers
+Content-Type: application/json
+X-Idempotency-Key: idk-123
+
+{ fromAccount": "76d4eb69-f737-4b61-b506-ddfc0995ad51", "toAccount": "4b3a44bb-5655-41ab-9e4d-8058c8794d7f", "amount": 3000,"currency": "USD" }
+```
+
+Note: The client generates the key (for example, a UUID) and reuses it only to retry the same request. Use a new key for every new deposit. 
+
+When you send the transfer request, the system will:
+1. Checks if the sending account is the same as the reciving account. This is so the system does not create unnecessary entries.
+2. Computes a SHA-256 hash of the deposit (Transaction Type, Sending Account Id, Receiving Account Id, Deposit Amount and Currency).
+3. When a transfer request arrives, the system: Checks if the idempotency key already exists, but the hash is not the same, the request is rejected with a 422 as the key has already been used with a different deposit information. 
+4. When a transfer request arrives, the system: Checks if the idempotency key does not exist, then the system will check that the currency sent in the deposit is the same as the one configured in the customer's account
+5. Then, the system checks if the transfer currency matches the currencies on both accounts.
+6. It also checks if the account type on any of the accounts is a system account.
+7. Finally, tne system creates the transaction, both entries and return the response.
+
+
+```json
+{
+    "transactionId": "4172e71f-d447-466b-a692-2efb0654ee40",
+    "fromAccount": "76d4eb69-f737-4b61-b506-ddfc0995ad51",
+    "toAccount": "4b3a44bb-5655-41ab-9e4d-8058c8794d7f",
+    "type": "TRANSFER",
+    "amount": 3000
+}
+```
 ## Design decisions
 
 **Money as integer cents.** Amounts are stored as `BIGINT` and handled as `long`, never
@@ -159,7 +188,7 @@ is written again and the original result is returned. This protects against fail
 as a lost network response, where the client cannot know if the request succeeded and has 
 to retry. If the client sends a request using an already existing Idempotency Key, but with
 different content, it gets rejected with a 422. The content is compared so that a reused key 
-cannot return the result of a different operation.   
+cannot return the result of a different operation. This works for deposits and transfers
 
 ## Known limitations
 

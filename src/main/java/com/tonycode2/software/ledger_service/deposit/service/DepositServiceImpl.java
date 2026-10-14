@@ -1,24 +1,21 @@
-package com.tonycode2.software.ledger_service.ledger.service;
+package com.tonycode2.software.ledger_service.deposit.service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tonycode2.software.ledger_service.Utils.RequestHasher;
 import com.tonycode2.software.ledger_service.account.model.Account;
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
 import com.tonycode2.software.ledger_service.account.repository.AccountRepository;
 import com.tonycode2.software.ledger_service.common.exceptions.AccountNotFoundException;
 import com.tonycode2.software.ledger_service.common.exceptions.IdempotencyKeyReusedException;
 import com.tonycode2.software.ledger_service.common.exceptions.InvalidCurrencyException;
-import com.tonycode2.software.ledger_service.ledger.dto.CreateDeposit;
-import com.tonycode2.software.ledger_service.ledger.dto.DepositHash;
-import com.tonycode2.software.ledger_service.ledger.dto.DepositResponse;
+import com.tonycode2.software.ledger_service.deposit.dto.CreateDeposit;
+import com.tonycode2.software.ledger_service.deposit.dto.DepositHash;
+import com.tonycode2.software.ledger_service.deposit.dto.DepositResponse;
 import com.tonycode2.software.ledger_service.ledger.model.Entry;
 import com.tonycode2.software.ledger_service.ledger.model.LedgerTransaction;
 import com.tonycode2.software.ledger_service.ledger.model.enums.EntryDirection;
@@ -47,7 +44,7 @@ public class DepositServiceImpl implements DepositService {
         DepositHash hash = new DepositHash(TransactionType.DEPOSIT.toString(), deposit.accountId(), deposit.amount(),
                 deposit.currency().toUpperCase());
 
-        String requestHash = requestHashHelper(hash);
+        String requestHash = RequestHasher.requestHashHelper(hash);
         Optional<LedgerTransaction> ledgerTransactionWithSameIdempotency = ledgerTransactionRepository
                 .findByIdempotencyKey(idempotencyKey);
 
@@ -70,7 +67,7 @@ public class DepositServiceImpl implements DepositService {
             throw new InvalidCurrencyException("The deposit currency is not the same as the account currency");
         }
 
-        List<Account> externalAccountList = accountRepository.findByCurrencyAndType(deposit.currency(),
+        List<Account> externalAccountList = accountRepository.findByCurrencyAndType(deposit.currency().toUpperCase(),
                 AccountType.SYSTEM);
         if (externalAccountList.isEmpty()) {
             throw new AccountNotFoundException("The external account was not found");
@@ -79,33 +76,17 @@ public class DepositServiceImpl implements DepositService {
 
         LedgerTransaction transaction = new LedgerTransaction(idempotencyKey, requestHash,
                 TransactionType.DEPOSIT, null);
-        Entry customerEntry = new Entry(transaction, customerAccount, EntryDirection.CREDIT, deposit.amount());
+        LedgerTransaction savedTransaction = ledgerTransactionRepository.save(transaction);
+        Entry customerEntry = new Entry(savedTransaction, customerAccount, EntryDirection.CREDIT, deposit.amount());
         customerAccount.credit(deposit.amount());
-        Entry externalEntry = new Entry(transaction, externalAccount, EntryDirection.DEBIT, deposit.amount());
+        Entry externalEntry = new Entry(savedTransaction, externalAccount, EntryDirection.DEBIT, deposit.amount());
         externalAccount.debit(deposit.amount());
 
-        LedgerTransaction savedTransaction = ledgerTransactionRepository.save(transaction);
         entryRepository.saveAll(List.of(customerEntry, externalEntry));
 
         return new DepositResponse(savedTransaction.getId(), savedTransaction.getType(),
                 customerAccount.getId(), deposit.amount());
 
-    }
-
-    private String requestHashHelper(DepositHash h) {
-        String canonical = String.join("|",
-                TransactionType.DEPOSIT.toString(),
-                h.accountId().toString(),
-                String.valueOf(h.amount()),
-                h.currency());
-
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(canonical.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is not available", e);
-        }
     }
 
 }

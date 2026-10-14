@@ -65,10 +65,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(InvalidTransferTypeException.class)
+    ProblemDetail handleInvalidTransferTypeException(InvalidTransferTypeException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
+                "Invalid Transfer Type Exception");
+        return pd;
+    }
+
     @ExceptionHandler(InvalidCurrencyException.class)
     ProblemDetail handleInvalidCurrencyException(InvalidCurrencyException ex) {
         ProblemDetail pd = constructProblemDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(),
                 "Invalid Currency");
+        return pd;
+    }
+
+    @ExceptionHandler(SameAccountTransferException.class)
+    ProblemDetail handleInvalidDuplicateEntryException(SameAccountTransferException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Invalid Duplicate Entry Exception");
         return pd;
     }
 
