@@ -4,6 +4,8 @@ import java.util.UUID;
 
 public record TransferResponse(
         UUID transactionId,
+        UUID fromAccount,
+        UUID toAccount,
         String type,
         long amount) {
 
