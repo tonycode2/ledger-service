@@ -1,5 +1,6 @@
 package com.tonycode2.software.ledger_service.deposit.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,6 @@ public class DepositController {
     public ResponseEntity<DepositResponse> deposit(@RequestBody @Valid CreateDeposit deposit,
             @RequestHeader("X-Idempotency-Key") String idempotencyId) {
         DepositResponse response = service.deposit(deposit, idempotencyId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

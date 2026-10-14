@@ -76,12 +76,12 @@ public class DepositServiceImpl implements DepositService {
 
         LedgerTransaction transaction = new LedgerTransaction(idempotencyKey, requestHash,
                 TransactionType.DEPOSIT, null);
-        Entry customerEntry = new Entry(transaction, customerAccount, EntryDirection.CREDIT, deposit.amount());
+        LedgerTransaction savedTransaction = ledgerTransactionRepository.save(transaction);
+        Entry customerEntry = new Entry(savedTransaction, customerAccount, EntryDirection.CREDIT, deposit.amount());
         customerAccount.credit(deposit.amount());
-        Entry externalEntry = new Entry(transaction, externalAccount, EntryDirection.DEBIT, deposit.amount());
+        Entry externalEntry = new Entry(savedTransaction, externalAccount, EntryDirection.DEBIT, deposit.amount());
         externalAccount.debit(deposit.amount());
 
-        LedgerTransaction savedTransaction = ledgerTransactionRepository.save(transaction);
         entryRepository.saveAll(List.of(customerEntry, externalEntry));
 
         return new DepositResponse(savedTransaction.getId(), savedTransaction.getType(),
