@@ -141,7 +141,7 @@ POST /api/v1/transfers
 Content-Type: application/json
 X-Idempotency-Key: idk-123
 
-{ fromAccount": "76d4eb69-f737-4b61-b506-ddfc0995ad51", "toAccount": "4b3a44bb-5655-41ab-9e4d-8058c8794d7f", "amount": 3000,"currency": "USD" }
+{ "fromAccount": "76d4eb69-f737-4b61-b506-ddfc0995ad51", "toAccount": "4b3a44bb-5655-41ab-9e4d-8058c8794d7f", "amount": 3000,"currency": "USD" }
 ```
 
 Note: The client generates the key (for example, a UUID) and reuses it only to retry the same request. Use a new key for every new deposit. 
