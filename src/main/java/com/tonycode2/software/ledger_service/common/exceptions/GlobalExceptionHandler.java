@@ -86,6 +86,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(InvalidSortedByException.class)
+    ProblemDetail handleInvalidSortedByException(InvalidSortedByException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(), "Invalid Sorted By");
+        return pd;
+    }
+
+    @ExceptionHandler(IllegalPageablePropertiesException.class)
+    ProblemDetail handleIllegalPageablePropertiesException(IllegalPageablePropertiesException ex) {
+        ProblemDetail pd = constructProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Illegal Pageable Properties");
+        return pd;
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);

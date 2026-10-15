@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tonycode2.software.ledger_service.Utils.RequestHasher;
 import com.tonycode2.software.ledger_service.account.model.Account;
 import com.tonycode2.software.ledger_service.account.model.enums.AccountType;
 import com.tonycode2.software.ledger_service.account.repository.AccountRepository;
@@ -22,6 +21,7 @@ import com.tonycode2.software.ledger_service.ledger.model.enums.EntryDirection;
 import com.tonycode2.software.ledger_service.ledger.model.enums.TransactionType;
 import com.tonycode2.software.ledger_service.ledger.repository.EntryRepository;
 import com.tonycode2.software.ledger_service.ledger.repository.LedgerTransactionRepository;
+import com.tonycode2.software.ledger_service.utils.RequestHasher;
 
 @Service
 public class DepositServiceImpl implements DepositService {

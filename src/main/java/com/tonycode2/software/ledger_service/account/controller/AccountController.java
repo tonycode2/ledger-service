@@ -3,6 +3,7 @@ package com.tonycode2.software.ledger_service.account.controller;
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tonycode2.software.ledger_service.account.dto.AccountResponse;
 import com.tonycode2.software.ledger_service.account.dto.CreateAccountRequest;
 import com.tonycode2.software.ledger_service.account.service.AccountService;
+import com.tonycode2.software.ledger_service.ledger.dto.EntryResponse;
 
 import jakarta.validation.Valid;
 
@@ -43,7 +46,14 @@ public class AccountController {
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponse> getById(@PathVariable UUID id) {
         AccountResponse response = service.getAccountById(id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{id}/entries")
+    public ResponseEntity<Page<EntryResponse>> getEntriesByAccountId(@RequestParam int pageNumber,
+            @RequestParam int pageSize, @RequestParam String sortedBy, UUID id) {
+        Page<EntryResponse> response = service.getEntriesByAccountId(id, pageNumber, pageSize, sortedBy);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
