@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -127,6 +129,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(status, message);
         pd.setTitle(title);
         return pd;
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ProblemDetail handleOptimisticLock(OptimisticLockingFailureException ex) {
+        log.warn("Optimistic lock conflict", ex);
+        return constructProblemDetail(HttpStatus.CONFLICT,
+                "The resource was modified by another request. Please retry.", "Concurrent Update");
+    }
+
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    ProblemDetail handleLockFailure(PessimisticLockingFailureException ex) {
+        log.warn("Lock failure", ex);
+        return constructProblemDetail(HttpStatus.CONFLICT,
+                "The operation could not acquire its lock. Please retry.", "Lock Failure");
     }
 
 }
