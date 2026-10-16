@@ -186,12 +186,6 @@ class TransferConcurrencyTest {
         }
     }
 
-    /**
-     * Lanza todas las transferencias a la vez. El latch "start" funciona como
-     * pistola de salida: todos los hilos se preparan y esperan, y se liberan
-     * juntos.
-     * Cada transferencia usa su propia idempotency key (son intenciones distintas).
-     */
     private Results runAll(List<CreateTransfer> requests) throws Exception {
         int n = requests.size();
         ExecutorService pool = Executors.newFixedThreadPool(n);

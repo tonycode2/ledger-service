@@ -43,13 +43,11 @@ public class TransferServiceImpl implements TransferService {
     @Transactional
     @Override
     public TransferResponse transfer(CreateTransfer transfer, String idempotencyId) {
-        // 1) Validaciones baratas, sin tocar la base de datos
         if (transfer.fromAccount().equals(transfer.toAccount())) {
             throw new InvalidDuplicateEntryException("Both accounts are the same");
         }
         String currency = transfer.currency().toUpperCase();
 
-        // 2) Idempotencia
         TransferHash hash = new TransferHash(TransactionType.TRANSFER.toString(), transfer.fromAccount(),
                 transfer.toAccount(), transfer.amount(), currency);
         String requestHash = RequestHasher.requestHashHelper(hash);
@@ -64,9 +62,6 @@ public class TransferServiceImpl implements TransferService {
             throw new IdempotencyKeyReusedException("The key has already been used with another content");
         }
 
-        // 3) BLOQUEO: las dos cuentas SIEMPRE en el mismo orden (id menor primero),
-        // sin importar quien es origen y quien destino. Asi A->B y B->A no se
-        // bloquean mutuamente (sin deadlock): el segundo hilo espera al primero.
         UUID firstId = transfer.fromAccount().compareTo(transfer.toAccount()) < 0
                 ? transfer.fromAccount()
                 : transfer.toAccount();
@@ -80,7 +75,6 @@ public class TransferServiceImpl implements TransferService {
         Account fromAccount = first.getId().equals(transfer.fromAccount()) ? first : second;
         Account toAccount = (fromAccount == first) ? second : first;
 
-        // 4) Reglas de negocio, ya con las filas bloqueadas (el saldo leido es fiable)
         if (!fromAccount.getCurrency().equalsIgnoreCase(currency)
                 || !toAccount.getCurrency().equalsIgnoreCase(currency)) {
             throw new InvalidCurrencyException("The transfer currency does not match the accounts");
@@ -89,8 +83,6 @@ public class TransferServiceImpl implements TransferService {
             throw new InvalidTransferTypeException("This transfer is not allowed");
         }
 
-        // 5) Mover el dinero primero (falla pronto con InsufficientFunds), luego
-        // persistir
         fromAccount.debit(transfer.amount());
         toAccount.credit(transfer.amount());
 
