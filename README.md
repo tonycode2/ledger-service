@@ -15,8 +15,8 @@ concurrent requests and client retries.
 - [x] Data model and balance rules
 - [x] Accounts API (create and get)
 - [x] Deposits
-- [ ] Transfers
-- [ ] Concurrency control
+- [x] Transfers
+- [x] Concurrency control
 - [x] Idempotency (sequential retries; concurrent retries pending)
 - [ ] Outbox and messaging
 
@@ -190,13 +190,21 @@ to retry. If the client sends a request using an already existing Idempotency Ke
 different content, it gets rejected with a 422. The content is compared so that a reused key 
 cannot return the result of a different operation. This works for deposits and transfers
 
+**Pessimistic locking with ordered acquisition.** Two concurrent transfers from the same
+account can both read the same balance and both approve, spending more than the account
+holds. Transfers lock both accounts with `SELECT ... FOR UPDATE`, always in ascending id
+order, so the second request waits and then reads the committed balance. The fixed order
+also prevents deadlocks between opposite transfers (A to B and B to A). `@Version` stays
+as a safety net: on its own it keeps balances correct but rejects valid transfers under
+contention. In a test with 200 concurrent transfers of 1 from a balance of 100, exactly 100
+succeed and 100 are rejected. See [ADR 0001](docs/adr/0001-locking-strategy.md).
+
 ## Known limitations
 
 - One currency per account.
 - Debit and credit follow a simplified convention: debit takes money out of an
   account, credit puts money in.
 - Concurrent retries with the same idempotency key are not handled yet (the database rejects the duplicate, but the client gets a generic error).
-- No concurrency control yet on balances.
 - The deposit response does not include the new balance. Use `GET /api/v1/accounts/{id}`.
 
 ## Tech stack
