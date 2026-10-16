@@ -7,6 +7,8 @@ spring:
     username: tony
     password: ledgerpassword
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 200
 
   jpa:
     hibernate:
@@ -18,3 +20,4 @@ spring:
     url: jdbc:postgresql://localhost:5432/ledger-service
     user: migration-admin
     password: migration
+  

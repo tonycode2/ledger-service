@@ -1,4 +1,4 @@
-package com.tonycode2.software.ledger_service.Utils;
+package com.tonycode2.software.ledger_service.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
