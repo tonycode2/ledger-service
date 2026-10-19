@@ -9,7 +9,7 @@ public record DepositResponse(
         TransactionType type,
         UUID accountId,
         long amount) {
-    public DepositResponse from(UUID transactionId, TransactionType type, UUID accountId, long amount) {
+    public static DepositResponse from(UUID transactionId, TransactionType type, UUID accountId, long amount) {
         return new DepositResponse(transactionId, type, accountId, amount);
     }
 }
