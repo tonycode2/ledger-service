@@ -197,7 +197,7 @@ order, so the second request waits and then reads the committed balance. The fix
 also prevents deadlocks between opposite transfers (A to B and B to A). `@Version` stays
 as a safety net: on its own it keeps balances correct but rejects valid transfers under
 contention. In a test with 200 concurrent transfers of 1 from a balance of 100, exactly 100
-succeed and 100 are rejected. See [ADR 0001](docs/adr/0001-locking-strategy.md).
+succeed and 100 are rejected. See [ADR 0001](src/main/resources/docs/adr/0001-locking-strategy.md).
 
 ## Known limitations
 
